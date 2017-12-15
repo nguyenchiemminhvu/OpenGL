@@ -22,6 +22,7 @@ public:
 	void deleteBuffer();
 
 	void renderBuffer(GLenum mode, GLint first, GLsizei count);
+	void renderBufferInstanced(GLenum mode, GLint first, GLsizei count, GLsizei numInstance);
 
 private:
 	

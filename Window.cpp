@@ -5,10 +5,12 @@
 #include <stdlib.h>
 #include <iostream>
 
+#include "Shader.h"
 #include "VertexBuffer.h"
 
 #define __CURRENT_LESSION__		2
 
+// --------------------------------------
 #define __GET_STARTED__			1
 #define __HELLO_TRIANGLE__		2
 #define __SHADERS__				3
@@ -42,6 +44,7 @@
 #define __DEBUGGING__			31
 #define __TEXT_RENDERING__		32
 #define	__2D_GAME_PRACTICE__	33
+// --------------------------------------
 
 using std::cout;
 using std::endl;
@@ -175,6 +178,13 @@ int Window::exec() {
 		0.0f,  0.5f, 0.0f
 	};
 
+	VertexBuffer vbBuffer;
+	vbBuffer.bind();
+	vbBuffer.setData(sizeof(vertices), vertices);
+	vbBuffer.unbind();
+
+	Shader shader("hello_triangle_vs.glsl", "hello_triangle_fs.glsl");
+
 	// --------------------------------------------------------------
 	// game loop
 	while (!windowShouldClose())
@@ -193,6 +203,12 @@ int Window::exec() {
 		// drawing
 		clearColor(0, 0, 0, 0);
 		clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		shader.use();
+
+		vbBuffer.bind();
+		vbBuffer.renderBuffer(GL_TRIANGLES, 0, 3);
+		vbBuffer.unbind();
 
 		swapBuffer();
 	}

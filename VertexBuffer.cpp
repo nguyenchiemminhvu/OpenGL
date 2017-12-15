@@ -55,3 +55,9 @@ void VertexBuffer::renderBuffer(GLenum mode, GLint first, GLsizei count)
 {
 	glDrawArrays(mode, first, count);
 }
+
+
+void VertexBuffer::renderBufferInstanced(GLenum mode, GLint first, GLsizei count, GLsizei numInstance)
+{
+	glDrawArraysInstanced(mode, first, count, numInstance);
+}
