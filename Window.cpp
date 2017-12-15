@@ -10,7 +10,7 @@
 #include "VertexBuffer.h"
 #include "ElementBuffer.h"
 
-#define __CURRENT_LESSION__		2
+#define __CURRENT_LESSION__		3
 
 // --------------------------------------
 #define __GET_STARTED__			1
@@ -221,7 +221,6 @@ int Window::exec() {
 	eBuffer.setData(sizeof(indices), indices);
 	va.enableAttribute(shader.getAttribLocation("position"));
 	va.vertexAttribArray(shader.getAttribLocation("position"), 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat), 0);
-	eBuffer.unbind();
 	vbBuffer.unbind();
 	va.unbind();
 
@@ -245,16 +244,12 @@ int Window::exec() {
 
 		// drawing
 		clearColor(0, 0, 0, 0);
-		clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		clear(GL_COLOR_BUFFER_BIT);
 
 		shader.use();
 
 		va.bind();
-		vbBuffer.bind();
-		eBuffer.bind();
 		eBuffer.renderElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		eBuffer.unbind();
-		vbBuffer.unbind();
 		va.unbind();
 
 		swapBuffer();
