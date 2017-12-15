@@ -81,3 +81,4 @@ static void checkingError(const GLchar *operation) {
 }
 
 #endif //__WINDOW_H__
+// nguyenchiemminhvu add test git
