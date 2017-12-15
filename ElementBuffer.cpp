@@ -23,7 +23,6 @@ ElementBuffer::~ElementBuffer()
 
 void ElementBuffer::setData(GLsizeiptr size, const void * data)
 {
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferID);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 }
 

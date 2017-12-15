@@ -8,6 +8,7 @@
 #include "Shader.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
+#include "ElementBuffer.h"
 
 #define __CURRENT_LESSION__		2
 
@@ -173,24 +174,59 @@ int Window::exec() {
 	// --------------------------------------------------------------
 	// prepare for game loop
 
+	//float vertices[] = {
+	//	-0.5f, -0.5f, 0.0f,
+	//	0.5f, -0.5f, 0.0f,
+	//	0.0f,  0.5f, 0.0f
+	//};
+
 	float vertices[] = {
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f,  0.5f, 0.0f
+		0.5f,  0.5f, 0.0f,  // top right
+		0.5f, -0.5f, 0.0f,  // bottom right
+		-0.5f, -0.5f, 0.0f,  // bottom left
+		-0.5f,  0.5f, 0.0f   // top left 
+	};
+	unsigned int indices[] = {  // note that we start from 0!
+		0, 1, 3,  // first Triangle
+		1, 2, 3   // second Triangle
 	};
 
 	Shader shader("shaders/hello_triangle_vs.glsl", "shaders/hello_triangle_fs.glsl");
 
 	VertexBuffer vbBuffer;
 	VertexArray va;
+	ElementBuffer eBuffer;
+
+	// ======================================================
+	// draw first triangle
+	
+	//va.bind();
+	//vbBuffer.bind();
+	//vbBuffer.setData(sizeof(vertices), vertices);
+	//va.enableAttribute(shader.getAttribLocation("position"));
+	//va.vertexAttribArray(shader.getAttribLocation("position"), 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+	//vbBuffer.unbind();
+	//va.unbind();
+	
+	// ======================================================
+
+
+	// ======================================================
+	// draw more triangle using element buffer
 
 	va.bind();
 	vbBuffer.bind();
 	vbBuffer.setData(sizeof(vertices), vertices);
+	eBuffer.bind();
+	eBuffer.setData(sizeof(indices), indices);
 	va.enableAttribute(shader.getAttribLocation("position"));
-	va.vertexAttribArray(shader.getAttribLocation("position"), 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+	va.vertexAttribArray(shader.getAttribLocation("position"), 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat), 0);
+	eBuffer.unbind();
 	vbBuffer.unbind();
 	va.unbind();
+
+	// ======================================================
+
 
 	// --------------------------------------------------------------
 	// game loop
@@ -215,7 +251,9 @@ int Window::exec() {
 
 		va.bind();
 		vbBuffer.bind();
-		vbBuffer.renderBuffer(GL_TRIANGLES, 0, 3);
+		eBuffer.bind();
+		eBuffer.renderElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		eBuffer.unbind();
 		vbBuffer.unbind();
 		va.unbind();
 
