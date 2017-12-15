@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "Shader.h"
+#include "VertexArray.h"
 #include "VertexBuffer.h"
 
 #define __CURRENT_LESSION__		2
@@ -178,12 +179,18 @@ int Window::exec() {
 		0.0f,  0.5f, 0.0f
 	};
 
+	Shader shader("shaders/hello_triangle_vs.glsl", "shaders/hello_triangle_fs.glsl");
+
 	VertexBuffer vbBuffer;
+	VertexArray va;
+
+	va.bind();
 	vbBuffer.bind();
 	vbBuffer.setData(sizeof(vertices), vertices);
+	va.enableAttribute(shader.getAttribLocation("position"));
+	va.vertexAttribArray(shader.getAttribLocation("position"), 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
 	vbBuffer.unbind();
-
-	Shader shader("hello_triangle_vs.glsl", "hello_triangle_fs.glsl");
+	va.unbind();
 
 	// --------------------------------------------------------------
 	// game loop
@@ -206,9 +213,11 @@ int Window::exec() {
 
 		shader.use();
 
+		va.bind();
 		vbBuffer.bind();
 		vbBuffer.renderBuffer(GL_TRIANGLES, 0, 3);
 		vbBuffer.unbind();
+		va.unbind();
 
 		swapBuffer();
 	}
