@@ -1,6 +1,5 @@
 *.sln
-*.vcxproj
-*.vcxproj.filters
 /Debug/*
 /.vs
-*.db
+OpenGL.VC.db
+OpenGL.VC.VC.opendb

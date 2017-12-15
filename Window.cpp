@@ -1,6 +1,11 @@
+#pragma once
+
 #include "Window.h"
+
 #include <stdlib.h>
 #include <iostream>
+
+#include "VertexBuffer.h"
 
 #define __CURRENT_LESSION__		2
 
@@ -164,7 +169,11 @@ int Window::exec() {
 	// --------------------------------------------------------------
 	// prepare for game loop
 
-
+	float vertices[] = {
+		-0.5f, -0.5f, 0.0f,
+		0.5f, -0.5f, 0.0f,
+		0.0f,  0.5f, 0.0f
+	};
 
 	// --------------------------------------------------------------
 	// game loop
