@@ -5,6 +5,7 @@
 #include "glew\glew.h"
 #include "glfw\glfw3.h"
 #include "SOIL\SOIL.h"
+#include "stb_image.h"
 
 #include <string>
 
@@ -27,7 +28,14 @@ public:
 
 	void bind();
 	void unbind();
+
 	void textureParameteri(GLenum pname, GLint value);
+	void setWrap(GLint value);
+	void setWrapS(GLint value);
+	void setWrapT(GLint value);
+	void setMagFilter(GLint value);
+	void setMinFilter(GLint value);
+
 	void generateMipmap();
 	void loadImage(const char *path);
 

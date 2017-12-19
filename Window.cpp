@@ -10,7 +10,7 @@
 #include "VertexBuffer.h"
 #include "ElementBuffer.h"
 
-#define __CURRENT_LESSION__		3
+#define __CURRENT_LESSION__		4
 
 // --------------------------------------
 #define __GET_STARTED__			1
@@ -348,6 +348,8 @@ int Window::exec() {
 		// drawing
 		clearColor(0, 0, 0, 0);
 		clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
 
 		swapBuffer();
 	}
