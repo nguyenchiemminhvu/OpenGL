@@ -16,6 +16,9 @@
     <Filter Include="shaders">
       <UniqueIdentifier>{a51dc4c7-5800-4bb6-a47e-169a8943c791}</UniqueIdentifier>
     </Filter>
+    <Filter Include="textures">
+      <UniqueIdentifier>{1e222088-1d45-4a7e-afd4-57153bdb9cdd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -79,5 +82,28 @@
     <None Include="shaders\hello_shader_vs.glsl">
       <Filter>shaders</Filter>
     </None>
+    <None Include="shaders\hello_texture_fs.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\hello_texture_vs.glsl">
+      <Filter>shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="textures\glass_colored.png">
+      <Filter>textures</Filter>
+    </Image>
+    <Image Include="textures\grass.png">
+      <Filter>textures</Filter>
+    </Image>
+    <Image Include="textures\wall.png">
+      <Filter>textures</Filter>
+    </Image>
+    <Image Include="textures\wood.png">
+      <Filter>textures</Filter>
+    </Image>
+    <Image Include="textures\wood_specular.png">
+      <Filter>textures</Filter>
+    </Image>
   </ItemGroup>
 </Project>
