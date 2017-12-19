@@ -1,4 +1,5 @@
 #include "Texture.h"
+#include "SOIL\SOIL.h"
 
 void Texture::active(GLuint index)
 {
@@ -108,14 +109,14 @@ void Texture::generateMipmap()
 }
 
 
-void Texture::loadImage(const char *path)
+void Texture::loadImage(const char *path, bool flipVertically)
 {
 	int channel;
 
-	unsigned char *image = stbi_load(path, &width, &height, &channel, SOIL_LOAD_RGBA);
+	unsigned char *image = SOIL_load_image(path, &width, &height, &channel, SOIL_LOAD_RGBA);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
 	generateMipmap();
 	setPath(path);
 
-	stbi_image_free(image);
+	SOIL_free_image_data(image);
 }

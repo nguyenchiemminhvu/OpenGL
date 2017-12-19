@@ -6,8 +6,9 @@ in VS_OUT
 } fs_in;
 
 uniform sampler2D tex;
+uniform sampler2D tex2;
 
 void main()
 {
-	gl_FragColor = texture(tex, fs_in.uv);
+	gl_FragColor = mix(texture(tex, fs_in.uv), texture(tex2, fs_in.uv), 0.5);
 }

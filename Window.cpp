@@ -362,11 +362,23 @@ int Window::exec() {
 
 	Texture tex;
 	tex.bind();
-	tex.loadImage("textures/wall.png");
+	tex.loadImage("textures/wall.png", true);
 	tex.setMagFilter(GL_LINEAR);
 	tex.setMinFilter(GL_LINEAR);
 	tex.setWrap(GL_REPEAT);
 	tex.unbind();
+
+	Texture tex2;
+	tex2.bind();
+	tex2.loadImage("textures/wood.png", true);
+	tex2.setMagFilter(GL_LINEAR);
+	tex2.setMinFilter(GL_LINEAR);
+	tex2.setWrap(GL_REPEAT);
+	tex2.unbind();
+
+	shader.use();
+	shader.setUniform1i("tex", tex.getTextureID());
+	shader.setUniform1i("tex2", tex2.getTextureID());
 
 	// --------------------------------------------------------------
 	// game loop
@@ -391,6 +403,8 @@ int Window::exec() {
 
 		tex.bind();
 		Texture::active(tex.getTextureID());
+		tex2.bind();
+		Texture::active(tex2.getTextureID());
 
 		va.bind();
 		vb.bind();

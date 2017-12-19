@@ -4,8 +4,6 @@
 #pragma once
 #include "glew\glew.h"
 #include "glfw\glfw3.h"
-#include "SOIL\SOIL.h"
-#include "stb_image.h"
 
 #include <string>
 
@@ -37,7 +35,7 @@ public:
 	void setMinFilter(GLint value);
 
 	void generateMipmap();
-	void loadImage(const char *path);
+	void loadImage(const char *path, bool flipVertically = true);
 
 private:
 	GLuint textureID;
