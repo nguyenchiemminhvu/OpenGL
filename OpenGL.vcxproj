@@ -163,6 +163,8 @@
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\hello_shader_fs.glsl" />
+    <None Include="shaders\hello_shader_vs.glsl" />
     <None Include="shaders\hello_triangle_fs.glsl" />
     <None Include="shaders\hello_triangle_vs.glsl" />
   </ItemGroup>

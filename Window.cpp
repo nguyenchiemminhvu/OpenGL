@@ -265,6 +265,27 @@ int Window::exec() {
 	// --------------------------------------------------------------
 	// prepare for game loop
 
+	float vertices[] = {
+		// positions         // colors
+		0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
+		-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
+		0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top 
+	};
+
+	Shader shader("shaders/hello_shader_vs.glsl", "shaders/hello_shader_fs.glsl");
+
+	VertexArray va;
+	VertexBuffer vb;
+
+	va.bind();
+	vb.bind();
+	vb.setData(sizeof(vertices), vertices);
+	va.enableAttribute(shader.getAttribLocation("position"));
+	va.vertexAttribArray(shader.getAttribLocation("position"), 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
+	va.enableAttribute(shader.getAttribLocation("color"));
+	va.vertexAttribArray(shader.getAttribLocation("color"), 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+	vb.unbind();
+	va.unbind();
 
 
 	// --------------------------------------------------------------
@@ -285,6 +306,14 @@ int Window::exec() {
 		// drawing
 		clearColor(0, 0, 0, 0);
 		clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		shader.use();
+		
+		va.bind();
+		vb.bind();
+		vb.renderBuffer(GL_TRIANGLES, 0, 3);
+		vb.unbind();
+		va.unbind();
 
 		swapBuffer();
 	}
