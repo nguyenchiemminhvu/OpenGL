@@ -11,7 +11,7 @@
 #include "ElementBuffer.h"
 #include "Texture.h"
 
-#define __CURRENT_LESSION__		5
+#define __CURRENT_LESSION__		6
 
 // --------------------------------------
 #define __GET_STARTED__			1
@@ -420,6 +420,95 @@ int Window::exec() {
 }
 
 #elif __CURRENT_LESSION__ == __TRANSFORMATION__
+
+int Window::exec() {
+
+	// --------------------------------------------------------------
+	// prepare for game loop
+
+	float vertices[] = {
+		// positions          // texture coords
+		0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // top right
+		0.5f, -0.5f, 0.0f,   1.0f, 0.0f, // bottom right
+		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // bottom left
+		-0.5f,  0.5f, 0.0f,   0.0f, 1.0f  // top left 
+	};
+	unsigned int indices[] = {
+		0, 1, 3, // first triangle
+		1, 2, 3  // second triangle
+	};
+
+	Shader shader("shaders/hello_transform_vs.glsl", "shaders/hello_transform_fs.glsl");
+
+	VertexArray va;
+	VertexBuffer vb;
+	ElementBuffer eb;
+
+	va.bind();
+	vb.bind();
+	vb.setData(sizeof(vertices), vertices);
+	eb.bind();
+	eb.setData(sizeof(indices), indices);
+	va.enableAttribute(shader.getAttribLocation("position"));
+	va.vertexAttribArray(shader.getAttribLocation("position"), 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
+	va.enableAttribute(shader.getAttribLocation("uv"));
+	va.vertexAttribArray(shader.getAttribLocation("uv"), 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+	vb.unbind();
+	va.unbind();
+
+	Texture tex;
+	tex.bind();
+	tex.loadImage("textures/wall.png", true);
+	tex.setMagFilter(GL_LINEAR);
+	tex.setMinFilter(GL_LINEAR);
+	tex.setWrap(GL_REPEAT);
+	tex.unbind();
+
+	shader.use();
+	shader.setUniform1i("tex", tex.getTextureID());
+
+	// --------------------------------------------------------------
+	// game loop
+	while (!windowShouldClose())
+	{
+		glfwPollEvents();
+
+		::deltaTime = glfwGetTime() - ::last_time;
+		::last_time = glfwGetTime();
+		/* calculate FPS */
+		GLfloat fps = 1.0f / deltaTime;
+		while (glfwGetTime() - ::last_time < 1.0f / FPS) {
+
+		}
+		updateCamera();
+
+		// drawing
+		clearColor(0.3, 0.3, 0.5, 0);
+		clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		shader.use();
+
+		glm::mat4 transform;
+		transform = glm::rotate(transform, (float)glfwGetTime() * 5, glm::vec3(0.0, 1.0, 0.0));
+		shader.setUniformMatrix4fv("transform", 1, GL_FALSE, glm::value_ptr(transform));
+
+		tex.bind();
+		Texture::active(tex.getTextureID());
+
+		va.bind();
+		vb.bind();
+		eb.bind();
+		eb.renderElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		vb.bind();
+		va.bind();
+
+		swapBuffer();
+	}
+
+	return 0;
+}
+
+#elif __CURRENT_LESSION__ == __COORDINATE_SYSTEM__
 
 int Window::exec() {
 
