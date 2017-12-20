@@ -177,6 +177,8 @@
     <None Include="shaders\hello_transform_vs.glsl" />
     <None Include="shaders\hello_triangle_fs.glsl" />
     <None Include="shaders\hello_triangle_vs.glsl" />
+    <None Include="shaders\lighting_basic_fs.glsl" />
+    <None Include="shaders\lighting_basic_vs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\glass_colored.png" />
