@@ -27,6 +27,7 @@ public:
 	void bind();
 	void unbind();
 
+	void setDefaultParameters();
 	void textureParameteri(GLenum pname, GLint value);
 	void setWrap(GLint value);
 	void setWrapS(GLint value);

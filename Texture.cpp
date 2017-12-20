@@ -66,6 +66,14 @@ void Texture::unbind()
 }
 
 
+void Texture::setDefaultParameters()
+{
+	setWrap(GL_REPEAT);
+	setMinFilter(GL_LINEAR);
+	setMagFilter(GL_LINEAR);
+}
+
+
 void Texture::textureParameteri(GLenum pname, GLint value)
 {
 	glTexParameteri(GL_TEXTURE_2D, pname, value);

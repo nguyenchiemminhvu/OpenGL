@@ -151,6 +151,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="VertexArray.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -160,11 +161,14 @@
     <ClInclude Include="ElementBuffer.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="Utilities.h" />
     <ClInclude Include="VertexArray.h" />
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\hello_coord_fs.glsl" />
+    <None Include="shaders\hello_coord_vs.glsl" />
     <None Include="shaders\hello_shader_fs.glsl" />
     <None Include="shaders\hello_shader_vs.glsl" />
     <None Include="shaders\hello_texture_fs.glsl" />
