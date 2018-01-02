@@ -1,13 +1,22 @@
 #version 330 core
 
-in VS_OUT
-{
-	vec2 uv;
-} fs_in;
+layout(location = 0) in vec3 position;
+layout(location = 1) in vec3 normal;
 
-uniform sampler2D tex;
+out VS_OUT
+{
+	vec3 position;
+	vec3 normal;
+} vs_out;
+
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
 
 void main()
 {
-	gl_FragColor = texture(tex, fs_in.uv);
+	gl_Position = projection * view * model * vec4(position.xyz, 1.0);
+
+	vs_out.position = vec3(model * vec4(position, 1.0));
+	vs_out.normal = mat3(transpose(inverse(model))) * normal;
 }

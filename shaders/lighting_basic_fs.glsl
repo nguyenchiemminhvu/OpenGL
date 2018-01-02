@@ -1,20 +1,36 @@
 #version 330 core
 
-layout(location = 0) in vec3 position;
-layout(location = 1) in vec2 uv;
-
-out VS_OUT
+in VS_OUT
 {
-	vec2 uv;
-} vs_out;
+	vec3 position;
+	vec3 normal;
+} fs_in;
 
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+uniform vec3 eyePos;
+
+uniform vec3 lightPos;
+uniform vec3 lightColor;
+
+uniform vec3 fragColor;
 
 void main()
 {
-	gl_Position = projection * view * model * vec4(position.xyz, 1.0);
+	// ambient
+	float ambientStrength = 0.1;
+	vec3 ambient = lightColor * ambientStrength;
 
-	vs_out.uv = uv;
+	// diffuse
+	vec3 normal = normalize(fs_in.normal);
+	vec3 lightDir = normalize(fs_in.position - lightPos);
+	float diffuseStrength = max(dot(normal, -lightDir), 0.0);
+	vec3 diffuse = diffuseStrength * lightColor;
+
+	// specular
+	float specularStrength = 0.5;
+	vec3 viewDir = normalize(fs_in.position - eyePos);
+	vec3 reflectDir = reflect(lightDir, normal);
+	float spec = pow(max(dot(-viewDir, reflectDir), 0.0), 32.0);
+	vec3 specular = specularStrength * spec * lightColor;
+
+	gl_FragColor = vec4((ambient + diffuse + specular) * fragColor, 1.0);
 }

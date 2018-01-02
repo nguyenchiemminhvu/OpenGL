@@ -12,7 +12,7 @@ static GLdouble lastPosY = 0;
 
 const GLfloat YAW = -90.0f;
 const GLfloat PITCH = 0.0f;
-const GLfloat SPEED = 5.0f;
+const GLfloat SPEED = 1.0f;
 const GLfloat SENSITIVITIVE = 0.05f;
 const GLfloat FIELD_OF_VIEW = 60.0f;
 

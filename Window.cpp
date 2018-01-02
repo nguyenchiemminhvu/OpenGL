@@ -759,7 +759,66 @@ int Window::exec() {
 	// --------------------------------------------------------------
 	// prepare for game loop
 
+	float vertices[] = {
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+		0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+		0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+		0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+
+		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+		0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+		0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+		0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+		0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+		0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+		0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+		0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+		0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+		0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+	};
+
+	Shader shader("shaders/lighting_basic_vs.glsl", "shaders/lighting_basic_fs.glsl");
+
+	VertexArray va;
+	VertexBuffer vb;
+
+	va.bind();
+	vb.bind();
+	vb.setData(sizeof(vertices), vertices);
+	va.vertexAttribArray(shader.getAttribLocation("position"), 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
+	va.enableAttribute(shader.getAttribLocation("position"));
+	va.vertexAttribArray(shader.getAttribLocation("normal"), 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
+	va.enableAttribute(shader.getAttribLocation("normal"));
+	vb.unbind();
+	va.unbind();
+
+	glEnable(GL_DEPTH_TEST);
 
 	// --------------------------------------------------------------
 	// game loop
@@ -777,8 +836,41 @@ int Window::exec() {
 		updateCamera();
 
 		// drawing
-		clearColor(0, 0, 0, 0);
+		clearColor(0.1, 0.2, 0.3, 0);
 		clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		shader.use();
+
+
+		// matrices ---------------------------------------------------------------------
+		glm::mat4 model, view, projection;
+
+		model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
+		view = camera.getViewMatrix();
+		projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
+
+		shader.setUniformMatrix4fv("model", 1, GL_FALSE, glm::value_ptr(model));
+		shader.setUniformMatrix4fv("view", 1, GL_FALSE, glm::value_ptr(view));
+		shader.setUniformMatrix4fv("projection", 1, GL_FALSE, glm::value_ptr(projection));
+		// matrices ---------------------------------------------------------------------
+
+
+		// fragments ---------------------------------------------------------------------
+		shader.setUniform3f("fragColor", 0.5, 0.23, 0.4);
+		// fragments ---------------------------------------------------------------------
+
+
+		// lights ---------------------------------------------------------------------
+		shader.setUniform3f("eyePos", camera.cameraPosition.x, camera.cameraPosition.y, camera.cameraPosition.z);
+		shader.setUniform3f("lightColor", 1, 1, 1);
+		shader.setUniform3f("lightPos", camera.cameraPosition.x, camera.cameraPosition.y, camera.cameraPosition.z);
+		// lights ---------------------------------------------------------------------
+
+		va.bind();
+		vb.bind();
+		vb.renderBuffer(GL_TRIANGLES, 0, 36);
+		vb.unbind();
+		va.unbind();
 
 		swapBuffer();
 	}
