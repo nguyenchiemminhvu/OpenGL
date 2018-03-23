@@ -11,7 +11,7 @@
 #include "ElementBuffer.h"
 #include "Texture.h"
 
-#define __CURRENT_LESSION__		8
+#define __CURRENT_LESSION__		9
 
 // --------------------------------------
 #define __GET_STARTED__			1
@@ -871,6 +871,137 @@ int Window::exec() {
 		vb.renderBuffer(GL_TRIANGLES, 0, 36);
 		vb.unbind();
 		va.unbind();
+
+		swapBuffer();
+	}
+
+	return 0;
+}
+
+#elif __CURRENT_LESSION__ == __LIGHTING_MAP__
+
+int Window::exec() {
+
+	// --------------------------------------------------------------
+	// prepare for game loop
+
+	float vertices[] = {
+		// positions          // normals           // texture coords
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+		0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
+		0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+		0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+		0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
+		0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+		0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+
+		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+		0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+		0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+		0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
+		0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+		0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+		0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
+		0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+		0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
+	};
+
+	Shader shader("shaders/lighting_map_vs.glsl", "shaders/lighting_map_fs.glsl");
+
+	VertexArray va;
+	VertexBuffer vb;
+
+	va.bind();
+	vb.bind();
+	vb.setData(sizeof(vertices), vertices);
+	va.vertexAttribArray(shader.getAttribLocation("position"), 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), 0);
+	va.enableAttribute(shader.getAttribLocation("position"));
+	va.vertexAttribArray(shader.getAttribLocation("normal"), 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
+	va.enableAttribute(shader.getAttribLocation("normal"));
+	va.vertexAttribArray(shader.getAttribLocation("uv"), 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void *)(6 * sizeof(GLfloat)));
+	va.enableAttribute(shader.getAttribLocation("uv"));
+	vb.unbind();
+	va.unbind();
+
+	glEnable(GL_DEPTH_TEST);
+
+	// --------------------------------------------------------------
+	// game loop
+	while (!windowShouldClose())
+	{
+		glfwPollEvents();
+
+		::deltaTime = glfwGetTime() - ::last_time;
+		::last_time = glfwGetTime();
+		/* calculate FPS */
+		GLfloat fps = 1.0f / deltaTime;
+		cout << fps << endl;
+		while (glfwGetTime() - ::last_time < 1.0f / FPS)
+		{
+
+		}
+		updateCamera();
+
+		// drawing
+		clearColor(0.1, 0.2, 0.3, 0);
+		clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		shader.use();
+
+
+		// matrices ---------------------------------------------------------------------
+		glm::mat4 model, view, projection;
+
+		model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
+		view = camera.getViewMatrix();
+		projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
+
+		shader.setUniformMatrix4fv("model", 1, GL_FALSE, glm::value_ptr(model));
+		shader.setUniformMatrix4fv("view", 1, GL_FALSE, glm::value_ptr(view));
+		shader.setUniformMatrix4fv("projection", 1, GL_FALSE, glm::value_ptr(projection));
+		// matrices ---------------------------------------------------------------------
+
+		// materials --------------------------------------------------------------------
+
+		// materials --------------------------------------------------------------------
+
+		// lights -----------------------------------------------------------------------
+		shader.setUniform3f("eyePos", camera.cameraPosition.x, camera.cameraPosition.y, camera.cameraPosition.z);
+		// lights -----------------------------------------------------------------------
+
+
+
+		va.bind();
+		vb.bind();
+		vb.renderBuffer(GL_TRIANGLES, 0, 36);
+		vb.unbind();
+		va.unbind();
+
+		swapBuffer();
 
 		swapBuffer();
 	}
