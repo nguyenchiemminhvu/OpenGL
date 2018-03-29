@@ -947,6 +947,19 @@ int Window::exec() {
 	vb.unbind();
 	va.unbind();
 
+	Texture matDiffuse;
+	Texture matSpecular;
+
+	matDiffuse.bind();
+	matDiffuse.loadImage("textures/wood.png");
+	matDiffuse.setDefaultParameters();
+	matDiffuse.unbind();
+
+	matSpecular.bind();
+	matSpecular.loadImage("textures/wood_specular.png");
+	matSpecular.setDefaultParameters();
+	matSpecular.unbind();
+
 	glEnable(GL_DEPTH_TEST);
 
 	// --------------------------------------------------------------
@@ -985,15 +998,25 @@ int Window::exec() {
 		shader.setUniformMatrix4fv("projection", 1, GL_FALSE, glm::value_ptr(projection));
 		// matrices ---------------------------------------------------------------------
 
-		// materials --------------------------------------------------------------------
-
-		// materials --------------------------------------------------------------------
-
 		// lights -----------------------------------------------------------------------
 		shader.setUniform3f("eyePos", camera.cameraPosition.x, camera.cameraPosition.y, camera.cameraPosition.z);
+		shader.setUniform3f("light.position", camera.cameraPosition.x, camera.cameraPosition.y, camera.cameraPosition.z);
+		shader.setUniform3f("light.ambient", 0.1f, 0.1f, 0.1f);
+		shader.setUniform3f("light.diffuse", 0.6f, 0.6f, 0.1f);
+		shader.setUniform3f("light.specular", 1.0f, 1.0f, 1.0f);
 		// lights -----------------------------------------------------------------------
 
+		// materials --------------------------------------------------------------------
+		Texture::active(matDiffuse.getTextureID());
+		matDiffuse.bind();
+		shader.setUniform1i("material.diffuse", matDiffuse.getTextureID());
 
+		Texture::active(matSpecular.getTextureID());
+		matSpecular.bind();
+		shader.setUniform1i("material.specular", matSpecular.getTextureID());
+
+		shader.setUniform1f("material.shininess", 32.0f);
+		// materials --------------------------------------------------------------------
 
 		va.bind();
 		vb.bind();
