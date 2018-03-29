@@ -37,7 +37,21 @@ void main()
 	vec3 diffuse;
 	vec3 specular;
 
+	// ambient
+	ambient = light.ambient * vec3(texture(material.diffuse, fs_in.uv));
 
+	// diffuse
+	vec3 normal = normalize(fs_in.normal);
+	vec3 lightDir = normalize(fs_in.position - light.position);
+	float diff = max(0.0, dot(-lightDir, normal));
+	diffuse = diff * light.diffuse * vec3(texture(material.diffuse, fs_in.uv));
 
+	// specular
+	vec3 reflectDir = reflect(lightDir, normal);
+	vec3 viewDir = normalize(fs_in.position - eyePos);
+	float spec = pow(max(0.0, dot(reflectDir, -viewDir)), material.shininess);
+	specular = spec * light.specular * vec3(texture(material.specular, fs_in.uv));
+
+	// output
 	gl_FragColor = vec4(ambient + diffuse + specular, 1.0);
 }

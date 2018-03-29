@@ -1025,8 +1025,6 @@ int Window::exec() {
 		va.unbind();
 
 		swapBuffer();
-
-		swapBuffer();
 	}
 
 	return 0;
