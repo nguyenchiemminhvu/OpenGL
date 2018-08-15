@@ -11,7 +11,7 @@
 #include "ElementBuffer.h"
 #include "Texture.h"
 
-#define __CURRENT_LESSION__		9
+#define __CURRENT_LESSION__		8
 
 // --------------------------------------
 #define __GET_STARTED__			1
