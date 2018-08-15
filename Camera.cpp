@@ -16,6 +16,13 @@ glm::mat4 Camera::getViewMatrix()
 	return glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
 }
 
+glm::mat4 Camera::getProjectionMatrix()
+{
+	extern int width;
+	extern int height;
+	return glm::perspective(glm::radians(fieldOfView), (float)width / height, 0.1f, 100.0f);
+}
+
 void Camera::processKeyboard(CameraDirection direction, GLfloat deltaTime)
 {
 	GLfloat velocity = movementSpeed * deltaTime * 5.0f;

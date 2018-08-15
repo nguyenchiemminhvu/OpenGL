@@ -118,6 +118,12 @@
     <None Include="shaders\lighting_map_vs.glsl">
       <Filter>shaders</Filter>
     </None>
+    <None Include="shaders\lighting_casters_fs.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\lighting_casters_vs.glsl">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\glass_colored.png">

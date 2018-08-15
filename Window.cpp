@@ -71,6 +71,16 @@ double cameraMouseX = 0.0F, cameraMouseY = 0.0F;
 void updateCamera();
 
 
+void GetError() {
+	GLenum err;
+	for (;;) {
+		err = glGetError();
+		if (err == GL_NO_ERROR) break;
+		printf("Error: %s\n", glewGetErrorString(err));
+	}
+}
+
+
 Window::Window(const char * title, unsigned int width, unsigned int height)
 {
 	// -------------------------------------------------------------
@@ -947,6 +957,19 @@ int Window::exec() {
 	vb.unbind();
 	va.unbind();
 
+	Texture matDiffuse;
+	Texture matSpecular;
+
+	matDiffuse.bind();
+	matDiffuse.loadImage("textures/wood.png");
+	matDiffuse.setDefaultParameters();
+	matDiffuse.unbind();
+
+	matSpecular.bind();
+	matSpecular.loadImage("textures/wood_specular.png");
+	matSpecular.setDefaultParameters();
+	matSpecular.unbind();
+
 	glEnable(GL_DEPTH_TEST);
 
 	// --------------------------------------------------------------
@@ -985,15 +1008,25 @@ int Window::exec() {
 		shader.setUniformMatrix4fv("projection", 1, GL_FALSE, glm::value_ptr(projection));
 		// matrices ---------------------------------------------------------------------
 
-		// materials --------------------------------------------------------------------
-
-		// materials --------------------------------------------------------------------
-
 		// lights -----------------------------------------------------------------------
 		shader.setUniform3f("eyePos", camera.cameraPosition.x, camera.cameraPosition.y, camera.cameraPosition.z);
+		shader.setUniform3f("light.position", camera.cameraPosition.x, camera.cameraPosition.y, camera.cameraPosition.z);
+		shader.setUniform3f("light.ambient", 0.1f, 0.1f, 0.1f);
+		shader.setUniform3f("light.diffuse", 0.6f, 0.6f, 0.1f);
+		shader.setUniform3f("light.specular", 1.0f, 1.0f, 1.0f);
 		// lights -----------------------------------------------------------------------
 
+		// materials --------------------------------------------------------------------
+		Texture::active(matDiffuse.getTextureID());
+		matDiffuse.bind();
+		shader.setUniform1i("material.diffuse", matDiffuse.getTextureID());
 
+		Texture::active(matSpecular.getTextureID());
+		matSpecular.bind();
+		shader.setUniform1i("material.specular", matSpecular.getTextureID());
+
+		shader.setUniform1f("material.shininess", 32.0f);
+		// materials --------------------------------------------------------------------
 
 		va.bind();
 		vb.bind();
@@ -1002,6 +1035,203 @@ int Window::exec() {
 		va.unbind();
 
 		swapBuffer();
+	}
+
+	return 0;
+}
+
+#elif __CURRENT_LESSION__ == __LIGHTING_CASTER__
+
+int Window::exec() {
+
+	// --------------------------------------------------------------
+	// prepare for game loop
+
+	float vertices[] = {
+		// positions          // normals           // texture coords
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+		0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
+		0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+		0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+		0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
+		0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+		0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+
+		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+		0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+		0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+		0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
+		0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+		0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+		0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
+		0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+		0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
+	};
+
+	glm::vec3 cubePositions[] = {
+		glm::vec3(0.0f,  0.0f,  0.0f),
+		glm::vec3(2.0f,  5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3(2.4f, -0.4f, -3.5f),
+		glm::vec3(-1.7f,  3.0f, -7.5f),
+		glm::vec3(1.3f, -2.0f, -2.5f),
+		glm::vec3(1.5f,  2.0f, -2.5f),
+		glm::vec3(1.5f,  0.2f, -1.5f),
+		glm::vec3(-1.3f,  1.0f, -1.5f)
+	};
+
+	Shader shader("shaders/lighting_casters_vs.glsl", "shaders/lighting_casters_fs.glsl");
+
+	VertexArray va;
+	VertexBuffer vb;
+
+	va.bind();
+	vb.bind();
+	vb.setData(sizeof(vertices), vertices);
+	va.vertexAttribArray(shader.getAttribLocation("position"), 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), 0);
+	va.enableAttribute(shader.getAttribLocation("position"));
+	va.vertexAttribArray(shader.getAttribLocation("normal"), 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
+	va.enableAttribute(shader.getAttribLocation("normal"));
+	va.vertexAttribArray(shader.getAttribLocation("uv"), 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void *)(6 * sizeof(GLfloat)));
+	va.enableAttribute(shader.getAttribLocation("uv"));
+	vb.unbind();
+	va.unbind();
+
+	Texture cubeDiffuse;
+	Texture cubeSpecular;
+
+	cubeDiffuse.bind();
+	cubeDiffuse.loadImage("textures/wood.png");
+	cubeDiffuse.setDefaultParameters();
+	cubeDiffuse.unbind();
+
+	cubeSpecular.bind();
+	cubeSpecular.loadImage("textures/wood_specular.png");
+	cubeSpecular.setDefaultParameters();
+	cubeSpecular.unbind();
+
+	glEnable(GL_DEPTH_TEST);
+
+	// --------------------------------------------------------------
+	// game loop
+	while (!windowShouldClose())
+	{
+		glfwPollEvents();
+
+		::deltaTime = glfwGetTime() - ::last_time;
+		::last_time = glfwGetTime();
+		/* calculate FPS */
+		//GLfloat fps = 1.0f / deltaTime;
+		//cout << fps << endl;
+		while (glfwGetTime() - ::last_time < 1.0f / FPS)
+		{
+
+		}
+		updateCamera();
+
+		// drawing
+		clearColor(0.1, 0.2, 0.3, 0);
+		clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		shader.use();
+
+		shader.setUniform3f("eyePos", camera.cameraPosition.x, camera.cameraPosition.y, camera.cameraPosition.z);
+
+
+		// choose which kind of light to use
+		int useSunLight = 1;
+		int usePointLight = 0;
+		int useFlashLight = 0;
+		shader.setUniform1i("useSunLight", useSunLight);
+		shader.setUniform1i("usePointLight", usePointLight);
+		shader.setUniform1i("useFlashLight", useFlashLight);
+
+		// view, projection matrix
+		{
+			glm::mat4 view, projection;
+
+			view = camera.getViewMatrix();
+			projection = camera.getProjectionMatrix();
+
+			shader.setUniformMatrix4fv("view", 1, GL_FALSE, glm::value_ptr(view));
+			shader.setUniformMatrix4fv("projection", 1, GL_FALSE, glm::value_ptr(projection));
+		}
+
+		// cube material
+		{
+			// materials --------------------------------------------------------------------
+			Texture::active(cubeDiffuse.getTextureID());
+			cubeDiffuse.bind();
+			shader.setUniform1i("material.diffuse", cubeDiffuse.getTextureID());
+
+			Texture::active(cubeSpecular.getTextureID());
+			cubeSpecular.bind();
+			shader.setUniform1i("material.specular", cubeSpecular.getTextureID());
+
+			shader.setUniform1f("material.shininess", 32.0f);
+			// materials --------------------------------------------------------------------
+		}
+
+		// directional light
+		if (useSunLight)
+		{
+
+		}
+
+		// point light
+		if (usePointLight)
+		{
+
+		}
+
+		// spot light
+		if (useFlashLight)
+		{
+
+		}
+
+		
+		va.bind();
+		vb.bind();
+
+		int numCubes = sizeof(cubePositions) / sizeof(glm::vec3);
+		for (int i = 0; i < numCubes; i++)
+		{
+			glm::mat4 model;
+			model = glm::translate(model, cubePositions[i]);
+			model = glm::rotate(model, glm::radians(20.0f * i), glm::vec3(1.0f, 0.3f, 0.5f));
+			shader.setUniformMatrix4fv("model", 1, GL_FALSE, glm::value_ptr(model));
+
+			vb.renderBuffer(GL_TRIANGLES, 0, 36);
+		}
+
+		va.unbind();
+		vb.unbind();
 
 		swapBuffer();
 	}
