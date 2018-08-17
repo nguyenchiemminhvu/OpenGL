@@ -25,6 +25,7 @@ struct Light
 	vec3 specular;
 };
 
+uniform float time;
 
 uniform vec3 eyePos;
 uniform Material material;
@@ -53,5 +54,7 @@ void main()
 	specular = spec * light.specular * vec3(texture(material.specular, fs_in.uv));
 
 	// output
-	gl_FragColor = vec4(ambient + diffuse + specular, 1.0);
+	vec4 outputColor = vec4(ambient + diffuse + specular, 1.0);
+	outputColor *= abs(sin(time * 2));
+	gl_FragColor = outputColor;
 }
