@@ -187,6 +187,7 @@
   <ItemGroup>
     <Image Include="textures\glass_colored.png" />
     <Image Include="textures\grass.png" />
+    <Image Include="textures\matrix.png" />
     <Image Include="textures\wall.png" />
     <Image Include="textures\wood.png" />
     <Image Include="textures\wood_specular.png" />
